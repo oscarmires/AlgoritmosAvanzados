@@ -16,19 +16,25 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <queue>
+#include <unordered_set>
+
 using namespace std;
 
 struct Point {
   int i;
   int j;
+
   Point() {
     this->i = 0;
     this->j = 0;
   };
+
   Point(int i, int j) {
     this->i = i;
     this->j = j;
   }
+
   Point right() {
     return Point(this->i, this->j + 1);
   }
@@ -40,6 +46,15 @@ struct Point {
   }
   Point up() {
     return Point(this->i - 1, this->j);
+  }
+};
+
+struct Node {
+  Node* prev;
+  Point p;
+  Node(Point current, Node* parent) {
+    this->p = current;
+    this->prev = parent;
   }
 };
 
@@ -68,7 +83,8 @@ private:
    * backtracking
    * Complejidad:
    *  O(k) matriz 1x1
-   *  O(m * n) promedio
+   *  O(m + n) promedio
+   *  O(m * n) peor caso (zig zag)
    */
   bool backtracking(Point currentPos) {
     if (currentPos.i == m - 1 && currentPos.j == n - 1) {
@@ -110,22 +126,6 @@ private:
   }
 
 public:
-  /*
-    Maze() {
-      this->m = 4;
-      this->n = 4;
-      this->result = vector<vector<int>>(m, vector<int>(n, 0));
-      this->result[0][0] = 1;
-      this->result[m - 1][n - 1] = 1;
-      this->visited = vector<vector<bool>>(m, vector<bool>(n, 0));
-      this->path.push(Point(0, 0));
-
-      this->maze = { {1, 0, 0, 0},
-                     {1, 1, 0, 1},
-                     {0, 1, 0, 0},
-                     {1, 1, 1, 1} };
-    }
-  */
   Maze(int m, int n) {
     this->m = m;
     this->n = n;
@@ -134,7 +134,6 @@ public:
     this->result[m - 1][n - 1] = 1;
     this->visited = vector<vector<bool>>(m, vector<bool>(n, 0));
   }
-
 
   void readInput() {
     int val;
@@ -166,19 +165,68 @@ public:
     }
   }
 
-  void backtracking() {
-    this->backtracking(Point(0, 0));
+  void reset() {
+    this->result = vector<vector<int>>(m, vector<int>(n, 0));
+    this->result[0][0] = 1;
+    this->result[m - 1][n - 1] = 1;
+    this->visited = vector<vector<bool>>(m, vector<bool>(n, 0));
   }
 
-  void branchAndBound() {
+  void backtracking() {
+    this->reset();
+    this->backtracking(Point(0, 0));
+    this->printSolution();
+  }
 
+  /**
+   * branchAndBound
+   *
+   * complejidad:
+   *  O(1) mejor caso (matriz 1x1)
+   *  O(v) caso promedio (donde v es la longitud del camino más corto al final del laberinto)
+   *  O(m*n) peor caso (matriz llena de unos)
+   */
+  void branchAndBound() {
+    this->reset();
+
+    queue<Node*> fila;
+    fila.push(new Node(Point(0, 0), nullptr));
+    Node* currentPos = fila.front();
+    Point neighbor;
+
+    while (!fila.empty()) {
+      currentPos = fila.front();
+      fila.pop();
+
+      if (isVisited(currentPos->p)) continue;
+
+      if (currentPos->p.i == m - 1 && currentPos->p.j == n - 1) {
+        while (currentPos->prev) {
+          this->result[currentPos->p.i][currentPos->p.j] = 1;
+          currentPos = currentPos->prev;
+        }
+        this->printSolution();
+        return;
+      }
+
+      this->visited[currentPos->p.i][currentPos->p.j] = true;
+
+      neighbor = currentPos->p.right();
+      if (isPointValid(neighbor) && !isVisited(neighbor)) fila.push(new Node(neighbor, currentPos));
+      neighbor = currentPos->p.down();
+      if (isPointValid(neighbor) && !isVisited(neighbor)) fila.push(new Node(neighbor, currentPos));
+      neighbor = currentPos->p.left();
+      if (isPointValid(neighbor) && !isVisited(neighbor)) fila.push(new Node(neighbor, currentPos));
+      neighbor = currentPos->p.up();
+      if (isPointValid(neighbor) && !isVisited(neighbor)) fila.push(new Node(neighbor, currentPos));
+    }
+
+    cout << "No se encontró una solución" << endl;
   }
 };
 
-
 int main() {
   int m, n;
-
   cin >> m;
   if (m <= 0) {
     cout << "Entrada no valida" << endl;
@@ -192,8 +240,10 @@ int main() {
 
   Maze laberinto(m, n);
   laberinto.readInput();
+  cout << "Backtracking" << endl;
   laberinto.backtracking();
-  laberinto.printSolution();
+  cout << "\nBranch & Bound" << endl;
+  laberinto.branchAndBound();
 
   return 0;
 }
