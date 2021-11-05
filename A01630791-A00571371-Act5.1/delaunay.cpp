@@ -5,8 +5,8 @@
 
 //SudoLeo 2010/7/20
 //CGAL required, GLUT required
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-//#include <CGAL/Triangulation_euclidean_traits_xy_3.h>
 #include <CGAL/Projection_traits_xy_3.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <GLUT/glut.h>
@@ -58,18 +58,15 @@ void points_clear()
   tri_state = 0;
 }
 
-void read_file() // Leer datos del conjunto de puntos de un archivo, utilizado durante la depuración
+void read_file() // Leer datos del conjunto de input, utilizado durante la depuración
 {
-  FILE* f;
-  f = freopen("data.txt", "r", stdin);
+  int n, a, b;
+  std::cin >> n;
 
-  int a, b;
-  while (std::cin >> a >> b)
-  {
+  for (int i = 0; i < n; i++) {
+    std::cin >> a >> b;
     vertices.push_back(Point(a, b));
   }
-
-  fclose(f);
 }
 
 void points_triangulation()
@@ -84,7 +81,7 @@ void points_triangulation()
   glPushMatrix();
 
   Delaunay::Finite_faces_iterator fit; // Iterar sobre todas las caras (caras finitas) de Delaunay y dibujar los bordes de cada cara
-  glColor3f(0.0, 0.0, 1.0);
+  glColor3f(0.529, 1.0, 0.078);
   for (fit = dt.finite_faces_begin(); fit != dt.finite_faces_end(); fit++)
   {
     glBegin(GL_LINE_LOOP);
@@ -98,7 +95,7 @@ void points_triangulation()
 
   glEnable(GL_LINE_STIPPLE); // Usa el modo punteado, es decir, usa una línea de puntos para dibujar el diagrama de Voronoi
   glLineStipple(1, 0x3333);
-  glColor3f(0.0, 0.0, 0.0);
+  glColor3f(1.0, 0.886, 0.078);
 
   for (eit = dt.edges_begin(); eit != dt.edges_end(); eit++)
   {
@@ -147,7 +144,7 @@ void reshape(int w, int h)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  glOrtho(0, w, 0, h, -1.0, 1.0);
+  glOrtho(0, w, h, 0, -1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 }
@@ -185,7 +182,7 @@ int main(int argc, char** argv)
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(800, 600);
-  glutInitWindowPosition(100, 100);
+  glutInitWindowPosition(400, 100);
   glutCreateWindow(argv[0]);
   init();
   glutDisplayFunc(display);
@@ -195,4 +192,3 @@ int main(int argc, char** argv)
   glutMainLoop();
   return 0;
 }
-

@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.1...3.15)
 
-project( act_5_1 )
+project( main )
 
 
 # CGAL and its components
@@ -33,22 +33,21 @@ endif()
 # include for local package
 
 
-# Creating entries for target: act_5_1
+# Creating entries for target: main
 # ############################
 
-add_executable( act_5_1  delaunay.cpp )
+add_executable( main  delaunay.cpp )
 
-add_to_cached_list( CGAL_EXECUTABLE_TARGETS act_5_1 )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
 # Link the executable to CGAL and third-party libraries
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 target_link_libraries(
-  act_5_1 
+  main 
   PRIVATE 
   CGAL::CGAL
   ${OPENGL_LIBRARIES}
   GLUT::GLUT 
 )
-
