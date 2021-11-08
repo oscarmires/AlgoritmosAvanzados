@@ -131,7 +131,6 @@ void init(void)
 {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_FLAT);
-
 }
 
 void reshape(int w, int h)
@@ -139,6 +138,9 @@ void reshape(int w, int h)
   global_w = w;
   global_h = h;
   points_clear();
+
+  int w_translation = w * 0.4;
+  int h_translation = h * 1.4;
 
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
@@ -182,7 +184,7 @@ int main(int argc, char** argv)
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(800, 600);
-  glutInitWindowPosition(400, 100);
+  glutInitWindowPosition(100, 100);
   glutCreateWindow(argv[0]);
   init();
   glutDisplayFunc(display);
